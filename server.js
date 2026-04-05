@@ -46,6 +46,32 @@ const server = http.createServer(async (req, res) => {
     "/download/windows": "exe",
   };
 
+  // Legacy v3.x auto-update endpoint: /update/:platform/:version
+  const updateMatch = path.match(/^\/update\/(.+?)\/(.+?)\/(.+)$/);
+  if (updateMatch) {
+    const version = updateMatch[3];
+    if (version.startsWith("3.")) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          name: "4.0.0",
+          notes:
+            "<h2>A new major version of Mx. Voice is available!</h2>" +
+            "<p>Automatic updates are not supported for this upgrade. " +
+            'Please visit <a href="https://mxvoice.app">mxvoice.app</a> ' +
+            "to download the latest version.</p>",
+          pub_date: new Date().toISOString(),
+          url: "https://mxvoice.app",
+        })
+      );
+      return;
+    }
+    // Non-3.x clients: no update available
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   const extension = platformMap[path];
 
   if (!extension) {
