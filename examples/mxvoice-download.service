@@ -1,0 +1,17 @@
+[Unit]
+Description=Mx. Voice Download Redirect Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=rails
+Group=rails
+WorkingDirectory=/home/rails/mxvoice-download
+ExecStart=/usr/bin/docker compose up -d --build
+ExecStop=/usr/bin/docker compose down
+ExecReload=/usr/bin/docker compose up -d --build
+
+[Install]
+WantedBy=multi-user.target
